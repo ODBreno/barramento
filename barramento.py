@@ -27,7 +27,7 @@ def login():
     except requests.exceptions.RequestException as e:
         return jsonify({'message': 'Erro ao conectar ao backend.', 'error': str(e)}), 500
 
-# Rota para obter as vagas ativas
+# Rota para obter a vaga ativa
 @app.route('/active_spot', methods=['POST'])
 def get_active_spot():
     data = request.get_json()
@@ -36,6 +36,19 @@ def get_active_spot():
         return jsonify({'message': 'Placa do carro não fornecida.'}), 400
     try:
         response = requests.post(f'{BACKEND_URL}/active_spot', json={'placaDoCarro': placa_do_carro})
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({'message': 'Erro ao conectar ao backend.', 'error': str(e)}), 500
+
+# Rota para obter todas as vagas do cliente
+@app.route('/all_spots', methods=['POST'])
+def get_all_spots():
+    data = request.get_json()
+    placa_do_carro = data.get('placaDoCarro')
+    if not placa_do_carro:
+        return jsonify({'message': 'Placa do carro não fornecida.'}), 400
+    try:
+        response = requests.post(f'{BACKEND_URL}/all_spots', json={'placaDoCarro': placa_do_carro})
         return jsonify(response.json()), response.status_code
     except requests.exceptions.RequestException as e:
         return jsonify({'message': 'Erro ao conectar ao backend.', 'error': str(e)}), 500
