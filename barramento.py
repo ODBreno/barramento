@@ -176,5 +176,19 @@ def buy_spot():
     except requests.exceptions.RequestException as e:
         return jsonify({'message': 'Erro ao conectar ao backend.', 'error': str(e)}), 500
 
+@app.route('/get_info', methods=['POST'])
+def get_info():
+    data = request.get_json()
+    placa_do_carro = data.get('placadocarro')
+    cpf = data.get('cpf')
+    if not placa_do_carro:
+        return jsonify({'message': 'Placa do carro não fornecida.'}), 400
+    try:
+        client_info = requests.post(f'{BACKEND_URL}/cliente_info', json={'placadocarro': placa_do_carro}).json()
+        fiscal_info = requests.post(f'{BACKEND_URL}/fiscal_info', json={'cpf': cpf}).json()
+        return jsonify({"client_info":client_info, "fiscal_info":fiscal_info}), 200
+    except Exception as e:
+        return jsonify({'message': 'Erro ao obter informações do cliente.', 'error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(port=5001, debug=True)
